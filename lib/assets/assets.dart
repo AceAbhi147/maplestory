@@ -1,23 +1,16 @@
 class AppAssets {
   // Images
   static const cat_staying = [
-    "assets/images/cat/cat_01.png",
-    "assets/images/cat/cat_02.png",
-    "assets/images/cat/cat_03.png",
-    "assets/images/cat/cat_04.png",
-    "assets/images/cat/cat_05.png",
-    "assets/images/cat/cat_06.png",
-    "assets/images/cat/cat_07.png",
-    "assets/images/cat/cat_08.png",
-    "assets/images/cat/cat_09.png",
+    "assets/images/cat/cat_1.png",
+    "assets/images/cat/cat_2.png",
+    "assets/images/cat/cat_3.png",
+    "assets/images/cat/cat_4.png",
+    "assets/images/cat/cat_5.png",
+    "assets/images/cat/cat_6.png",
+    "assets/images/cat/cat_7.png",
+    "assets/images/cat/cat_8.png",
+    "assets/images/cat/cat_9.png",
     "assets/images/cat/cat_10.png",
-    "assets/images/cat/cat_11.png",
-    "assets/images/cat/cat_12.png",
-    "assets/images/cat/cat_13.png",
-    "assets/images/cat/cat_14.png",
-    "assets/images/cat/cat_15.png",
-    "assets/images/cat/cat_16.png",
-    "assets/images/cat/cat_17.png",
   ];
 
   static const cat_running = [
@@ -29,6 +22,9 @@ class AppAssets {
 
   static const ninja_standing = [
     "assets/images/ninja/ninjastand1.png",
+    "assets/images/ninja/ninjastand2.png",
+    "assets/images/ninja/ninjastand3.png",
+    "assets/images/ninja/ninjastand4.png",
   ];
 
   static const ninja_throwing = [
@@ -42,9 +38,6 @@ class AppAssets {
     "assets/images/ninja/ninjarunning2.png",
     "assets/images/ninja/ninjarunning3.png",
     "assets/images/ninja/ninjarunning4.png",
-    "assets/images/ninja/ninjarunning5.png",
-    "assets/images/ninja/ninjarunning6.png",
-    "assets/images/ninja/ninjarunning7.png",
   ];
 
   static const ninja_hurting = [

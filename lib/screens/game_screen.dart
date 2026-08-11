@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:maplestory/assets/assets.dart';
+import 'package:maplestory/widgets/pet_widget.dart';
+import 'package:maplestory/widgets/player_widget.dart';
 import 'package:maplestory/widgets/snail_widget.dart';
 
 class GameScreen extends StatefulWidget {
@@ -12,7 +14,7 @@ class GameScreen extends StatefulWidget {
   State<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends State<GameScreen>{
+class _GameScreenState extends State<GameScreen> {
   Timer? _gameTimer;
 
   bool gameStarted = false;
@@ -20,9 +22,23 @@ class _GameScreenState extends State<GameScreen>{
 
   // Snail position
   double snailX = 0.5;
-  double snailY = 1.0;
+  double snailY = 0.98;
   double snailVelocityX = -0.01;
   int snailImageCount = 0;
+
+  // Player position
+  double playerX = -0.5;
+  double playerY = 0.98;
+  double playerSpeedX = 0.0;
+  bool isFacingLeft = false;
+  int playerImageCount = 0;
+
+  // Pet position
+  double petX = -0.7;
+  double petY = 0.97;
+  bool isPetFacingLeft = false;
+  bool isPetRunning = false;
+  int petImageCount = 0;
 
   @override
   void initState() {
@@ -38,6 +54,8 @@ class _GameScreenState extends State<GameScreen>{
     _gameTimer = Timer.periodic(Duration(milliseconds: 100), (timer) {
       setState(() {
         moveSnail();
+        movePlayer();
+        movePet();
       });
     });
   }
@@ -67,6 +85,46 @@ class _GameScreenState extends State<GameScreen>{
     snailImageCount = (snailImageCount + 1) % AppAssets.snail_staying.length;
   }
 
+  // Move player
+  void movePlayer() {
+    playerImageCount = (playerImageCount + 1) % 1000;
+    playerX += playerSpeedX;
+  }
+
+  // Move player left() {
+  void movePlayerLeft() {
+    isFacingLeft = true;
+    playerSpeedX = -0.05;
+  }
+
+  // Move player right() {
+  void movePlayerRight() {
+    isFacingLeft = false;
+    playerSpeedX = 0.05;
+  }
+
+  // Stop player movement
+  void stopPlayerMovement() {
+    playerSpeedX = 0.0;
+  }
+
+  // Move pet
+  void movePet() {
+    petImageCount = (petImageCount + 1) % 1000;
+    if ((playerX - petX).abs() >= 0.25) {
+      petX += playerSpeedX;
+      isPetRunning = true;
+    } else {
+      isPetRunning = false;
+    }
+
+    if (playerX >= petX) {
+      isPetFacingLeft = false;
+    } else {
+      isPetFacingLeft = true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,6 +136,64 @@ class _GameScreenState extends State<GameScreen>{
               color: Colors.blue,
               child: Stack(
                 children: [
+                  Align(
+                    alignment: Alignment(-1.0, 1.0),
+                    child: GestureDetector(
+                      onTapDown: (_) => movePlayerLeft(),
+                      onTapUp: (_) => stopPlayerMovement(),
+                      onTapCancel: () => stopPlayerMovement(),
+                      child: Container(
+                        height: 300,
+                        width: 100,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment(0.0, 0.5),
+                    child: GestureDetector(
+                      onTapDown: (_) => movePlayerLeft(),
+                      onTapUp: (_) => stopPlayerMovement(),
+                      onTapCancel: () => stopPlayerMovement(),
+                      child: Container(
+                        height: 300,
+                        width: 500,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment(1.0, 1.0),
+                    child: GestureDetector(
+                      onTapDown: (_) => movePlayerRight(),
+                      onTapUp: (_) => stopPlayerMovement(),
+                      onTapCancel: () => stopPlayerMovement(),
+                      child: Container(
+                        height: 300,
+                        width: 100,
+                        color: Colors.yellow,
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment(0.0, 1.0),
+                    child: Container(color: Colors.green, height: 20),
+                  ),
+                  PetWidget(
+                    petX: petX,
+                    petY: petY,
+                    petSpeedX: playerSpeedX,
+                    isFacingLeft: isPetFacingLeft,
+                    isRunning: isPetRunning,
+                    imageCount: petImageCount,
+                  ),
+                  PlayerWidget(
+                    playerX: playerX,
+                    playerY: playerY,
+                    playerSpeedX: playerSpeedX,
+                    isFacingLeft: isFacingLeft,
+                    imageCount: playerImageCount,
+                  ),
                   SnailWidget(
                     snailX: snailX,
                     snailY: snailY,
@@ -88,7 +204,6 @@ class _GameScreenState extends State<GameScreen>{
               ),
             ),
           ),
-          Container(color: Colors.green, height: 10),
           Expanded(
             child: Container(
               color: Colors.grey,
