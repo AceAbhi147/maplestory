@@ -41,7 +41,14 @@ class AppAssets {
   ];
 
   static const ninja_hurting = [
-    "assets/images/ninja/ninjahurt.png",
+    "assets/images/ninja/ninjahurt1.png",
+    "assets/images/ninja/ninjahurt2.png",
+  ];
+
+  static const ninja_jump = [
+    "assets/images/ninja/ninjajump1.png",
+    "assets/images/ninja/ninjajump2.png",
+    "assets/images/ninja/ninjajump3.png",
   ];
 
   static const ninja_star = [
@@ -70,6 +77,7 @@ class AppAssets {
     ...ninja_throwing,
     ...ninja_running,
     ...ninja_hurting,
+    ...ninja_jump,
     ...ninja_star,
     ...snail_staying,
     ...snail_hurting,

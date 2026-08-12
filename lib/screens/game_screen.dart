@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:maplestory/assets/assets.dart';
 import 'package:maplestory/widgets/pet_widget.dart';
 import 'package:maplestory/widgets/player_widget.dart';
@@ -30,8 +29,12 @@ class _GameScreenState extends State<GameScreen> {
   double playerX = -0.5;
   double playerY = 0.98;
   double playerSpeedX = 0.0;
+  double playerSpeedY = 0.0;
   bool isFacingLeft = false;
   int playerImageCount = 0;
+  double gravity = -9.8;
+  double velocityY = 2.5;
+  double dt = 0.01;
 
   // Pet position
   double petX = -0.7;
@@ -125,6 +128,41 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  // Player jumps
+  bool isJumping = false;
+  void playerJumps() {
+    if (isJumping) return;
+    isJumping = true;
+    if (isFacingLeft) {
+      playerSpeedX -= 0.05;
+    } else {
+      playerSpeedX += 0.05;
+    }
+    Timer.periodic(
+      const Duration(milliseconds: 16),
+          (timer) {
+        if (!mounted) {
+          timer.cancel();
+          return;
+        }
+
+        setState(() {
+          velocityY += gravity * dt;
+
+          playerY -= velocityY * dt;
+
+          if (playerY >= 0.98) {
+            playerY = 0.98;
+            isJumping = false;
+            playerSpeedX = 0.0;
+            velocityY = 2.5;
+            timer.cancel();
+          }
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -152,9 +190,7 @@ class _GameScreenState extends State<GameScreen> {
                   Align(
                     alignment: Alignment(0.0, 0.5),
                     child: GestureDetector(
-                      onTapDown: (_) => movePlayerLeft(),
-                      onTapUp: (_) => stopPlayerMovement(),
-                      onTapCancel: () => stopPlayerMovement(),
+                      onTap: () => playerJumps(),
                       child: Container(
                         height: 300,
                         width: 500,
@@ -191,7 +227,9 @@ class _GameScreenState extends State<GameScreen> {
                     playerX: playerX,
                     playerY: playerY,
                     playerSpeedX: playerSpeedX,
+                    playerSpeedY: velocityY,
                     isFacingLeft: isFacingLeft,
+                    isJumping: isJumping,
                     imageCount: playerImageCount,
                   ),
                   SnailWidget(
