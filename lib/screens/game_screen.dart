@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:maplestory/assets/assets.dart';
+import 'package:maplestory/widgets/ninja_star_widget.dart';
 import 'package:maplestory/widgets/pet_widget.dart';
 import 'package:maplestory/widgets/player_widget.dart';
 import 'package:maplestory/widgets/snail_widget.dart';
@@ -36,6 +37,12 @@ class _GameScreenState extends State<GameScreen> {
   double velocityY = 2.5;
   double dt = 0.01;
 
+  // Ninja star
+  double starDimension = 50;
+  double starSpeedX = 0.0;
+  double starPosX = 0.0;
+  double starPosY = 0.9;
+
   // Pet position
   double petX = -0.7;
   double petY = 0.97;
@@ -58,6 +65,7 @@ class _GameScreenState extends State<GameScreen> {
       setState(() {
         moveSnail();
         movePlayer();
+        playerAttack();
         movePet();
       });
     });
@@ -128,8 +136,29 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  bool isAttacking = false;
+
+  void startAttack() {
+    if (isAttacking) return;
+    isAttacking = true;
+    starPosX = playerX;
+    starPosY = playerY - 0.05;
+    starSpeedX = isFacingLeft ? -0.05 : 0.05;
+  }
+
+  // Player attacks
+  void playerAttack() {
+    if (!isAttacking) return;
+    starPosX += starSpeedX;
+    if ((playerX - starPosX).abs() >= 0.5) {
+      isAttacking = false;
+      starSpeedX = 0.0;
+    }
+  }
+
   // Player jumps
   bool isJumping = false;
+
   void playerJumps() {
     if (isJumping) return;
     isJumping = true;
@@ -138,29 +167,26 @@ class _GameScreenState extends State<GameScreen> {
     } else {
       playerSpeedX += 0.05;
     }
-    Timer.periodic(
-      const Duration(milliseconds: 16),
-          (timer) {
-        if (!mounted) {
+    Timer.periodic(const Duration(milliseconds: 16), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+
+      setState(() {
+        velocityY += gravity * dt;
+
+        playerY -= velocityY * dt;
+
+        if (playerY >= 0.98) {
+          playerY = 0.98;
+          isJumping = false;
+          playerSpeedX = 0.0;
+          velocityY = 2.5;
           timer.cancel();
-          return;
         }
-
-        setState(() {
-          velocityY += gravity * dt;
-
-          playerY -= velocityY * dt;
-
-          if (playerY >= 0.98) {
-            playerY = 0.98;
-            isJumping = false;
-            playerSpeedX = 0.0;
-            velocityY = 2.5;
-            timer.cancel();
-          }
-        });
-      },
-    );
+      });
+    });
   }
 
   @override
@@ -215,6 +241,13 @@ class _GameScreenState extends State<GameScreen> {
                     alignment: Alignment(0.0, 1.0),
                     child: Container(color: Colors.green, height: 20),
                   ),
+                  NinjaStarWidget(
+                    isAttacking: isAttacking,
+                    starDimension: starDimension,
+                    starPosX: starPosX,
+                    starPosY: starPosY,
+                    starSpeedX: starSpeedX,
+                  ),
                   PetWidget(
                     petX: petX,
                     petY: petY,
@@ -230,6 +263,8 @@ class _GameScreenState extends State<GameScreen> {
                     playerSpeedY: velocityY,
                     isFacingLeft: isFacingLeft,
                     isJumping: isJumping,
+                    isThrowing:
+                        isAttacking && (playerX - starPosX).abs() <= 0.1,
                     imageCount: playerImageCount,
                   ),
                   SnailWidget(
@@ -252,7 +287,12 @@ class _GameScreenState extends State<GameScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      ElevatedButton(onPressed: () {}, child: Text("Attack")),
+                      ElevatedButton(
+                        onPressed: () {
+                          startAttack();
+                        },
+                        child: Text("Attack"),
+                      ),
                       ElevatedButton(onPressed: () {}, child: Text("←")),
                       ElevatedButton(onPressed: () {}, child: Text("↑")),
                       ElevatedButton(onPressed: () {}, child: Text("→")),
