@@ -202,11 +202,14 @@ class _GameScreenState extends State<GameScreen>
                     facingDirection: pet.facingDirection,
                     imagePath: pet.image,
                   ),
-                  PlayerWidget(
-                    playerX: player.playerX,
-                    playerY: player.playerY,
-                    facingDirection: player.facingDirection,
-                    imagePath: player.image,
+                  GestureDetector(
+                    onTap: () => throwNinjaStar(),
+                    child: PlayerWidget(
+                      playerX: player.playerX,
+                      playerY: player.playerY,
+                      facingDirection: player.facingDirection,
+                      imagePath: player.image,
+                    ),
                   ),
                   ...snails.map(
                     (snail) => SnailWidget(

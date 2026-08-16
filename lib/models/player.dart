@@ -143,7 +143,7 @@ class Player {
   }
 
   void movePlayer(int timeElapsed) {
-    num dt = (timeElapsed - lastFrameTimestamp).clamp(0.0, 150.0);
+    num dt = (timeElapsed - lastFrameTimestamp);
     num physicsDt = (timeElapsed - lastPhysicsTimestamp).clamp(0.0, 33.0);
     lastPhysicsTimestamp = timeElapsed;
 
