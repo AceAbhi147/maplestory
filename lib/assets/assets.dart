@@ -70,6 +70,10 @@ class AppAssets {
     "assets/images/snail/snailhurt_3.png",
   ];
 
+  static const rock = "assets/images/background/rock.png";
+
+  static const grass = "assets/images/background/grass.png";
+
   static const allImages = [
     ...cat_staying,
     ...cat_running,
@@ -81,6 +85,8 @@ class AppAssets {
     ...ninja_star,
     ...snail_staying,
     ...snail_hurting,
+    grass,
+    rock,
   ];
 
   // Fonts

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:maplestory/screens/game_screen.dart';
 import 'package:maplestory/screens/splash_screen.dart';
 
 void main() {
@@ -14,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: GameScreen(),
+      home: SplashScreen(),
     );
   }
 }

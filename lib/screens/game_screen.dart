@@ -1,8 +1,8 @@
-import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:maplestory/assets/assets.dart';
 import 'package:maplestory/models/enums/facing_direction.dart';
 import 'package:maplestory/models/enums/ninja_star_state.dart';
 import 'package:maplestory/models/enums/player_state.dart';
@@ -70,7 +70,10 @@ class _GameScreenState extends State<GameScreen>
       moveSnail(_elapsedTime);
       moveNinjaStar(_elapsedTime);
       CollisionDetection.checkForCollisionBtwPlayerAndSnail(player, snails);
-      CollisionDetection.checkForCollisionBtwNinjaStarAndSnail(snails, ninjaStars);
+      CollisionDetection.checkForCollisionBtwNinjaStarAndSnail(
+        snails,
+        ninjaStars,
+      );
       setState(() => {});
     });
 
@@ -146,7 +149,13 @@ class _GameScreenState extends State<GameScreen>
           Expanded(
             flex: 3,
             child: Container(
-              color: Colors.blue,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.blue.shade700, Colors.lightBlue.shade100],
+                  end: Alignment.topCenter,
+                  begin: Alignment.bottomCenter,
+                ),
+              ),
               child: Stack(
                 children: [
                   Align(
@@ -156,22 +165,14 @@ class _GameScreenState extends State<GameScreen>
                           player.continuouslyMovePlayer(FacingDirection.left),
                       onTapUp: (_) => player.stopPlayerMovement(),
                       onTapCancel: () => player.stopPlayerMovement(),
-                      child: Container(
-                        height: 300,
-                        width: 100,
-                        color: Colors.red,
-                      ),
+                      child: Container(height: 300, width: 100, color: Colors.transparent),
                     ),
                   ),
                   Align(
                     alignment: Alignment(0.0, 0.5),
                     child: GestureDetector(
                       onTap: () => player.jump(),
-                      child: Container(
-                        height: 300,
-                        width: 500,
-                        color: Colors.green,
-                      ),
+                      child: Container(height: 300, width: 500, color: Colors.transparent),
                     ),
                   ),
                   Align(
@@ -181,16 +182,24 @@ class _GameScreenState extends State<GameScreen>
                           player.continuouslyMovePlayer(FacingDirection.right),
                       onTapUp: (_) => player.stopPlayerMovement(),
                       onTapCancel: () => player.stopPlayerMovement(),
-                      child: Container(
-                        height: 300,
-                        width: 100,
-                        color: Colors.yellow,
-                      ),
+                      child: Container(height: 300, width: 100, color: Colors.transparent),
                     ),
                   ),
                   Align(
                     alignment: Alignment(0.0, 1.0),
-                    child: Container(color: Colors.green, height: 20),
+                    child: Container(
+                      height: 20,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        image: DecorationImage(
+                          image: AssetImage(AppAssets.grass),
+                          repeat: ImageRepeat.repeatX,
+                          alignment: Alignment.centerLeft,
+                          fit: BoxFit.fitHeight,
+                        ),
+                      ),
+                    ),
                   ),
                   ...ninjaStars.map(
                     (ninjaStar) => NinjaStarWidget(
@@ -229,26 +238,14 @@ class _GameScreenState extends State<GameScreen>
           ),
           Expanded(
             child: Container(
-              color: Colors.grey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text("M A P E L S T O R Y"),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          throwNinjaStar();
-                        },
-                        child: Text("Attack"),
-                      ),
-                      ElevatedButton(onPressed: () {}, child: Text("←")),
-                      ElevatedButton(onPressed: () {}, child: Text("↑")),
-                      ElevatedButton(onPressed: () {}, child: Text("→")),
-                    ],
-                  ),
-                ],
+              decoration: BoxDecoration(
+                color: Colors.brown.shade900,
+                image: DecorationImage(
+                  image: AssetImage(AppAssets.rock),
+                  alignment: Alignment.topCenter,
+                  fit: BoxFit.fitHeight,
+                  repeat: ImageRepeat.repeatX,
+                ),
               ),
             ),
           ),
