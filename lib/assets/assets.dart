@@ -1,6 +1,7 @@
 class AppAssets {
   // Images
   static const cat_staying = [
+    "assets/images/cat/cat_0.png",
     "assets/images/cat/cat_1.png",
     "assets/images/cat/cat_2.png",
     "assets/images/cat/cat_3.png",
@@ -10,45 +11,44 @@ class AppAssets {
     "assets/images/cat/cat_7.png",
     "assets/images/cat/cat_8.png",
     "assets/images/cat/cat_9.png",
-    "assets/images/cat/cat_10.png",
   ];
 
   static const cat_running = [
+    "assets/images/cat/catrunning_0.png",
     "assets/images/cat/catrunning_1.png",
     "assets/images/cat/catrunning_2.png",
-    "assets/images/cat/catrunning_3.png",
-    "assets/images/cat/catrunning_4.png",
+    "assets/images/cat/catrunning_3.png"
   ];
 
   static const ninja_standing = [
+    "assets/images/ninja/ninjastand0.png",
     "assets/images/ninja/ninjastand1.png",
     "assets/images/ninja/ninjastand2.png",
     "assets/images/ninja/ninjastand3.png",
-    "assets/images/ninja/ninjastand4.png",
   ];
 
   static const ninja_throwing = [
+    "assets/images/ninja/ninjathrow0.png",
     "assets/images/ninja/ninjathrow1.png",
     "assets/images/ninja/ninjathrow2.png",
-    "assets/images/ninja/ninjathrow3.png",
   ];
 
   static const ninja_running = [
+    "assets/images/ninja/ninjarunning0.png",
     "assets/images/ninja/ninjarunning1.png",
     "assets/images/ninja/ninjarunning2.png",
     "assets/images/ninja/ninjarunning3.png",
-    "assets/images/ninja/ninjarunning4.png",
   ];
 
   static const ninja_hurting = [
+    "assets/images/ninja/ninjahurt0.png",
     "assets/images/ninja/ninjahurt1.png",
-    "assets/images/ninja/ninjahurt2.png",
   ];
 
   static const ninja_jump = [
+    "assets/images/ninja/ninjajump0.png",
     "assets/images/ninja/ninjajump1.png",
     "assets/images/ninja/ninjajump2.png",
-    "assets/images/ninja/ninjajump3.png",
   ];
 
   static const ninja_star = [
@@ -56,18 +56,18 @@ class AppAssets {
   ];
 
   static const snail_staying = [
-    "assets/images/snail/snail_01.png",
-    "assets/images/snail/snail_02.png",
-    "assets/images/snail/snail_03.png",
-    "assets/images/snail/snail_04.png",
-    "assets/images/snail/snail_05.png",
+    "assets/images/snail/snail_0.png",
+    "assets/images/snail/snail_1.png",
+    "assets/images/snail/snail_2.png",
+    "assets/images/snail/snail_3.png",
+    "assets/images/snail/snail_4.png",
   ];
 
   static const snail_hurting = [
+    "assets/images/snail/snailhurt_0.png",
     "assets/images/snail/snailhurt_1.png",
     "assets/images/snail/snailhurt_2.png",
     "assets/images/snail/snailhurt_3.png",
-    "assets/images/snail/snailhurt_4.png",
   ];
 
   static const allImages = [

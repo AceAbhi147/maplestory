@@ -1,0 +1,4 @@
+enum PetState {
+  moving,
+  idle,
+}

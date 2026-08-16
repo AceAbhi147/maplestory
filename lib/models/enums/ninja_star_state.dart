@@ -1,0 +1,4 @@
+enum NinjaStarState {
+  moving,
+  dead
+}

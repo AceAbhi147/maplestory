@@ -1,59 +1,47 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:maplestory/models/enums/facing_direction.dart';
 
 class SnailWidget extends StatelessWidget {
   final double snailX;
   final double snailY;
-  final double snailVelocityX;
-  final int imageCount;
+  final FacingDirection currentDirection;
+  final String image;
 
   const SnailWidget({
     super.key,
     required this.snailX,
     required this.snailY,
-    required this.snailVelocityX,
-    required this.imageCount,
+    required this.currentDirection,
+    required this.image,
   });
 
   @override
   Widget build(BuildContext context) {
-    return snailVelocityX < 0
-        ? Align(
-            alignment: Alignment(snailX, snailY),
-            child: Container(
-              height: 50,
-              width: 50,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(
-                    "assets/images/snail/snail_0${imageCount + 1}.png",
-                  ),
-                  fit: BoxFit.contain,
-                  alignment: Alignment.bottomCenter,
-                ),
-              ),
-            ),
-          )
-        : Align(
-            alignment: Alignment(snailX, snailY),
-            child: Transform(
-              alignment: Alignment.center,
+    if (image.isEmpty) return SizedBox.shrink();
+
+    Container snailContainer = Container(
+      height: 50,
+      width: 50,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(image),
+          fit: BoxFit.contain,
+          alignment: Alignment.bottomCenter,
+        ),
+      ),
+    );
+
+    return Align(
+      alignment: Alignment(snailX, snailY),
+      child: currentDirection == FacingDirection.left
+          ? snailContainer
+          : Transform(
               transform: Matrix4.rotationY(pi),
-              child: Container(
-                height: 50,
-                width: 50,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(
-                      "assets/images/snail/snail_0${imageCount + 1}.png",
-                    ),
-                    fit: BoxFit.contain,
-                    alignment: Alignment.bottomCenter,
-                  ),
-                ),
-              ),
+              alignment: Alignment.bottomCenter,
+              child: snailContainer,
             ),
-          );
+    );
   }
 }

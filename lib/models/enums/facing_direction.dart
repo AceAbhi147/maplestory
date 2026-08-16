@@ -1,0 +1,4 @@
+enum FacingDirection {
+  left,
+  right,
+}

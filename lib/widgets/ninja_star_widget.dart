@@ -2,57 +2,40 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:maplestory/assets/assets.dart';
+import 'package:maplestory/models/enums/facing_direction.dart';
 
 class NinjaStarWidget extends StatelessWidget {
-  final double starDimension;
   final double starPosX;
   final double starPosY;
-  final double starSpeedX;
-  final bool isAttacking;
+  final FacingDirection directionThrown;
 
   const NinjaStarWidget({
     super.key,
     required this.starPosX,
     required this.starPosY,
-    required this.isAttacking,
-    required this.starSpeedX,
-    required this.starDimension,
+    required this.directionThrown,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (!isAttacking) return SizedBox.shrink();
-    return starSpeedX > 0.0
-        ? Align(
-            alignment: Alignment(starPosX, starPosY),
-            child: Container(
-              height: starDimension,
-              width: starDimension,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(AppAssets.ninja_star.first),
-                  fit: BoxFit.contain,
-                  alignment: Alignment.bottomCenter,
-                ),
-              ),
-            ),
-          )
-        : Align(
-            alignment: Alignment(starPosX, starPosY),
-            child: Transform(
-              transform: Matrix4.rotationY(pi),
-              child: Container(
-                height: starDimension,
-                width: starDimension,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(AppAssets.ninja_star.first),
-                    fit: BoxFit.contain,
-                    alignment: Alignment.bottomCenter,
-                  ),
-                ),
-              ),
-            ),
-          );
+    Container ninjaStar = Container(
+      height: 40,
+      width: 40,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(AppAssets.ninja_star.first),
+          fit: BoxFit.contain,
+          alignment: Alignment.bottomCenter,
+        ),
+      ),
+    );
+
+    return Align(
+      alignment: Alignment(starPosX, starPosY),
+      child: directionThrown == FacingDirection.right ? ninjaStar : Transform(
+        transform: Matrix4.rotationY(pi),
+        alignment: Alignment.bottomCenter,
+        child: ninjaStar,),
+    );
   }
 }

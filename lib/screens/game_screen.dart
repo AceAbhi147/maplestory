@@ -1,11 +1,20 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:maplestory/assets/assets.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:maplestory/models/enums/facing_direction.dart';
+import 'package:maplestory/models/enums/ninja_star_state.dart';
+import 'package:maplestory/models/enums/player_state.dart';
+import 'package:maplestory/models/ninja_star.dart';
+import 'package:maplestory/models/pet.dart';
+import 'package:maplestory/models/player.dart';
 import 'package:maplestory/widgets/ninja_star_widget.dart';
 import 'package:maplestory/widgets/pet_widget.dart';
 import 'package:maplestory/widgets/player_widget.dart';
 import 'package:maplestory/widgets/snail_widget.dart';
+
+import '../models/snail.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -14,34 +23,18 @@ class GameScreen extends StatefulWidget {
   State<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends State<GameScreen> {
-  Timer? _gameTimer;
+class _GameScreenState extends State<GameScreen>
+    with SingleTickerProviderStateMixin {
+  Ticker? _gameTicker;
+  int _elapsedTime = 0;
 
   bool gameStarted = false;
   bool gameEnded = false;
 
-  // Snail position
-  double snailX = 0.5;
-  double snailY = 0.98;
-  double snailVelocityX = -0.01;
-  int snailImageCount = 0;
-
-  // Player position
-  double playerX = -0.5;
-  double playerY = 0.98;
-  double playerSpeedX = 0.0;
-  double playerSpeedY = 0.0;
-  bool isFacingLeft = false;
-  int playerImageCount = 0;
-  double gravity = -9.8;
-  double velocityY = 2.5;
-  double dt = 0.01;
-
-  // Ninja star
-  double starDimension = 50;
-  double starSpeedX = 0.0;
-  double starPosX = 0.0;
-  double starPosY = 0.9;
+  List<Snail> snails = [];
+  Queue<NinjaStar> ninjaStars = Queue();
+  late final Pet pet;
+  late final Player player;
 
   // Pet position
   double petX = -0.7;
@@ -53,7 +46,16 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void initState() {
     startGame();
+    initialiseSnails();
+    pet = Pet.name();
+    player = Player.name(pet: pet);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _gameTicker!.dispose();
+    super.dispose();
   }
 
   // Start game timer
@@ -61,132 +63,76 @@ class _GameScreenState extends State<GameScreen> {
     if (gameStarted) return;
     resetGame();
     gameStarted = true;
-    _gameTimer = Timer.periodic(Duration(milliseconds: 100), (timer) {
-      setState(() {
-        moveSnail();
-        movePlayer();
-        playerAttack();
-        movePet();
-      });
+    _gameTicker = Ticker((elapsed) {
+      _elapsedTime = elapsed.inMilliseconds;
+      movePlayer(_elapsedTime);
+      moveSnail(_elapsedTime);
+      moveNinjaStar(_elapsedTime);
+      setState(() => {});
     });
+
+    _gameTicker!.start();
+  }
+
+  // Initialise snails
+  void initialiseSnails() {
+    snails.add(
+      Snail.name(maxX: 0.8, minX: 0.0, snailSpeedX: 0.00003, snailX: 0.5),
+    );
+    snails.add(
+      Snail.name(maxX: 0.8, minX: 0.3, snailSpeedX: -0.00003, snailX: 0.8),
+    );
   }
 
   // Reset Game
   void resetGame() {
     gameStarted = false;
     gameEnded = false;
-    _gameTimer = null;
+    _elapsedTime = Duration.zero.inMilliseconds;
   }
 
   // End Game
   void endGame() {
     gameEnded = true;
-    _gameTimer?.cancel();
   }
 
   // Move snail
-  void moveSnail() {
-    if (snailX <= 0.3) {
-      snailVelocityX = 0.01;
-    } else if (snailX >= 0.8) {
-      snailVelocityX = -0.01;
-    }
-
-    snailX += snailVelocityX;
-    snailImageCount = (snailImageCount + 1) % AppAssets.snail_staying.length;
-  }
-
-  // Move player
-  void movePlayer() {
-    playerImageCount = (playerImageCount + 1) % 1000;
-    playerX += playerSpeedX;
-  }
-
-  // Move player left() {
-  void movePlayerLeft() {
-    isFacingLeft = true;
-    playerSpeedX = -0.05;
-  }
-
-  // Move player right() {
-  void movePlayerRight() {
-    isFacingLeft = false;
-    playerSpeedX = 0.05;
-  }
-
-  // Stop player movement
-  void stopPlayerMovement() {
-    playerSpeedX = 0.0;
-  }
-
-  // Move pet
-  void movePet() {
-    petImageCount = (petImageCount + 1) % 1000;
-    if ((playerX - petX).abs() >= 0.25) {
-      petX += playerSpeedX;
-      isPetRunning = true;
-    } else {
-      isPetRunning = false;
-    }
-
-    if (playerX >= petX) {
-      isPetFacingLeft = false;
-    } else {
-      isPetFacingLeft = true;
+  void moveSnail(int timeElapsed) {
+    for (final snail in snails) {
+      snail.moveSnail(timeElapsed);
     }
   }
 
-  bool isAttacking = false;
+  // Move ninja star if any
+  void moveNinjaStar(int timeElapsed) {
+    while (ninjaStars.isNotEmpty &&
+        ninjaStars.first.ninjaStarState == NinjaStarState.dead) {
+      ninjaStars.removeFirst();
+    }
 
-  void startAttack() {
-    if (isAttacking) return;
-    isAttacking = true;
-    starPosX = playerX;
-    starPosY = playerY - 0.05;
-    starSpeedX = isFacingLeft ? -0.05 : 0.05;
-  }
-
-  // Player attacks
-  void playerAttack() {
-    if (!isAttacking) return;
-    starPosX += starSpeedX;
-    if ((playerX - starPosX).abs() >= 0.5) {
-      isAttacking = false;
-      starSpeedX = 0.0;
+    for (final ninjaStar in ninjaStars) {
+      ninjaStar.moveNinjaStar(timeElapsed);
     }
   }
 
-  // Player jumps
-  bool isJumping = false;
+  // Move Player and pet with it
+  void movePlayer(int timeElapsed) {
+    player.movePlayer(timeElapsed);
+  }
 
-  void playerJumps() {
-    if (isJumping) return;
-    isJumping = true;
-    if (isFacingLeft) {
-      playerSpeedX -= 0.05;
-    } else {
-      playerSpeedX += 0.05;
-    }
-    Timer.periodic(const Duration(milliseconds: 16), (timer) {
-      if (!mounted) {
-        timer.cancel();
-        return;
-      }
-
-      setState(() {
-        velocityY += gravity * dt;
-
-        playerY -= velocityY * dt;
-
-        if (playerY >= 0.98) {
-          playerY = 0.98;
-          isJumping = false;
-          playerSpeedX = 0.0;
-          velocityY = 2.5;
-          timer.cancel();
-        }
-      });
-    });
+  void throwNinjaStar() {
+    player.playerState = PlayerState.attacking;
+    ninjaStars.add(
+      NinjaStar.name(
+        starSpeedX: player.facingDirection == FacingDirection.left
+            ? -0.0008
+            : 0.0008,
+        starCurrPosX: player.playerX,
+        starInitPosX: player.playerX,
+        starPosY: player.playerY - 0.1,
+        lastFrameTimestamp: _elapsedTime,
+      ),
+    );
   }
 
   @override
@@ -203,9 +149,10 @@ class _GameScreenState extends State<GameScreen> {
                   Align(
                     alignment: Alignment(-1.0, 1.0),
                     child: GestureDetector(
-                      onTapDown: (_) => movePlayerLeft(),
-                      onTapUp: (_) => stopPlayerMovement(),
-                      onTapCancel: () => stopPlayerMovement(),
+                      onTapDown: (_) =>
+                          player.continuouslyMovePlayer(FacingDirection.left),
+                      onTapUp: (_) => player.stopPlayerMovement(),
+                      onTapCancel: () => player.stopPlayerMovement(),
                       child: Container(
                         height: 300,
                         width: 100,
@@ -216,7 +163,7 @@ class _GameScreenState extends State<GameScreen> {
                   Align(
                     alignment: Alignment(0.0, 0.5),
                     child: GestureDetector(
-                      onTap: () => playerJumps(),
+                      onTap: () => player.jump(),
                       child: Container(
                         height: 300,
                         width: 500,
@@ -227,9 +174,10 @@ class _GameScreenState extends State<GameScreen> {
                   Align(
                     alignment: Alignment(1.0, 1.0),
                     child: GestureDetector(
-                      onTapDown: (_) => movePlayerRight(),
-                      onTapUp: (_) => stopPlayerMovement(),
-                      onTapCancel: () => stopPlayerMovement(),
+                      onTapDown: (_) =>
+                          player.continuouslyMovePlayer(FacingDirection.right),
+                      onTapUp: (_) => player.stopPlayerMovement(),
+                      onTapCancel: () => player.stopPlayerMovement(),
                       child: Container(
                         height: 300,
                         width: 100,
@@ -241,37 +189,32 @@ class _GameScreenState extends State<GameScreen> {
                     alignment: Alignment(0.0, 1.0),
                     child: Container(color: Colors.green, height: 20),
                   ),
-                  NinjaStarWidget(
-                    isAttacking: isAttacking,
-                    starDimension: starDimension,
-                    starPosX: starPosX,
-                    starPosY: starPosY,
-                    starSpeedX: starSpeedX,
+                  ...ninjaStars.map(
+                    (ninjaStar) => NinjaStarWidget(
+                      starPosX: ninjaStar.starCurrPosX,
+                      starPosY: ninjaStar.starPosY,
+                      directionThrown: ninjaStar.directionThrown,
+                    ),
                   ),
                   PetWidget(
-                    petX: petX,
-                    petY: petY,
-                    petSpeedX: playerSpeedX,
-                    isFacingLeft: isPetFacingLeft,
-                    isRunning: isPetRunning,
-                    imageCount: petImageCount,
+                    petX: pet.petX,
+                    petY: pet.petY,
+                    facingDirection: pet.facingDirection,
+                    imagePath: pet.image,
                   ),
                   PlayerWidget(
-                    playerX: playerX,
-                    playerY: playerY,
-                    playerSpeedX: playerSpeedX,
-                    playerSpeedY: velocityY,
-                    isFacingLeft: isFacingLeft,
-                    isJumping: isJumping,
-                    isThrowing:
-                        isAttacking && (playerX - starPosX).abs() <= 0.1,
-                    imageCount: playerImageCount,
+                    playerX: player.playerX,
+                    playerY: player.playerY,
+                    facingDirection: player.facingDirection,
+                    imagePath: player.image,
                   ),
-                  SnailWidget(
-                    snailX: snailX,
-                    snailY: snailY,
-                    snailVelocityX: snailVelocityX,
-                    imageCount: snailImageCount,
+                  ...snails.map(
+                    (snail) => SnailWidget(
+                      snailX: snail.snailX,
+                      snailY: snail.snailY,
+                      currentDirection: snail.snailDirection,
+                      image: snail.image,
+                    ),
                   ),
                 ],
               ),
@@ -289,7 +232,7 @@ class _GameScreenState extends State<GameScreen> {
                     children: [
                       ElevatedButton(
                         onPressed: () {
-                          startAttack();
+                          throwNinjaStar();
                         },
                         child: Text("Attack"),
                       ),
