@@ -8,22 +8,25 @@ class NinjaStarWidget extends StatelessWidget {
   final double starPosX;
   final double starPosY;
   final FacingDirection directionThrown;
+  final String imagePath;
 
   const NinjaStarWidget({
     super.key,
     required this.starPosX,
     required this.starPosY,
     required this.directionThrown,
+    required this.imagePath,
   });
 
   @override
   Widget build(BuildContext context) {
+    if (imagePath.isEmpty) return SizedBox.shrink();
     Container ninjaStar = Container(
       height: 40,
       width: 40,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage(AppAssets.ninja_star.first),
+          image: AssetImage(imagePath),
           fit: BoxFit.contain,
           alignment: Alignment.bottomCenter,
         ),

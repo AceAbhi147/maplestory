@@ -1,3 +1,4 @@
+import 'package:maplestory/assets/assets.dart';
 import 'package:maplestory/models/enums/facing_direction.dart';
 import 'package:maplestory/models/enums/ninja_star_state.dart';
 
@@ -8,6 +9,7 @@ class NinjaStar {
   final double _starPosY;
   late final FacingDirection _directionThrown;
   NinjaStarState _ninjaStarState = NinjaStarState.moving;
+  String _image = "";
   int _lastFrameTimestamp;
 
   NinjaStar.name({
@@ -56,14 +58,26 @@ class NinjaStar {
     _lastFrameTimestamp = value;
   }
 
+  String get image => _image;
+
+  set image(String value) {
+    _image = value;
+  }
+
   void moveNinjaStar(int timeElapsed) {
+    if (ninjaStarState == NinjaStarState.dead) {
+      image = "";
+      return;
+    }
     num dt = (timeElapsed - lastFrameTimestamp).clamp(0.0, 33.0);
     double newPosX = starCurrPosX + (starSpeedX * dt);
     if ((newPosX - starInitPosX).abs() >= 0.5) {
+      image = "";
       ninjaStarState = NinjaStarState.dead;
       return;
     }
 
+    image = AppAssets.ninja_star.first;
     starCurrPosX = newPosX;
     lastFrameTimestamp = timeElapsed;
   }

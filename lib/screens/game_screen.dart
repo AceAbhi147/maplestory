@@ -9,6 +9,7 @@ import 'package:maplestory/models/enums/player_state.dart';
 import 'package:maplestory/models/ninja_star.dart';
 import 'package:maplestory/models/pet.dart';
 import 'package:maplestory/models/player.dart';
+import 'package:maplestory/utils/collision_detection.dart';
 import 'package:maplestory/widgets/ninja_star_widget.dart';
 import 'package:maplestory/widgets/pet_widget.dart';
 import 'package:maplestory/widgets/player_widget.dart';
@@ -68,6 +69,8 @@ class _GameScreenState extends State<GameScreen>
       movePlayer(_elapsedTime);
       moveSnail(_elapsedTime);
       moveNinjaStar(_elapsedTime);
+      CollisionDetection.checkForCollisionBtwPlayerAndSnail(player, snails);
+      CollisionDetection.checkForCollisionBtwNinjaStarAndSnail(snails, ninjaStars);
       setState(() => {});
     });
 
@@ -194,6 +197,7 @@ class _GameScreenState extends State<GameScreen>
                       starPosX: ninjaStar.starCurrPosX,
                       starPosY: ninjaStar.starPosY,
                       directionThrown: ninjaStar.directionThrown,
+                      imagePath: ninjaStar.image,
                     ),
                   ),
                   PetWidget(

@@ -1,5 +1,6 @@
 import 'package:maplestory/assets/assets.dart';
 import 'package:maplestory/models/enums/facing_direction.dart';
+import 'package:maplestory/models/enums/pet_state.dart';
 import 'package:maplestory/models/enums/player_state.dart';
 import 'package:maplestory/models/pet.dart';
 
@@ -196,13 +197,33 @@ class Player {
         }
         image = "assets/images/ninja/ninjathrow1.png";
         break;
+      case PlayerState.hurting:
+        if (facingDirection == FacingDirection.left) {
+          playerSpeedX = 0.005;
+        } else {
+          playerSpeedX = -0.005;
+        }
+
+        playerX += playerSpeedX;
+
+        animationFrame = (dt ~/ 100) % AppAssets.ninja_hurting.length;
+        image = "assets/images/ninja/ninjahurt$animationFrame.png";
+
+        if (dt >= 500) {
+          playerState = PlayerState.dead;
+          _lastFrameTimestamp = timeElapsed;
+        }
       default:
+        playerSpeedX = 0.0;
         animationFrame = 0;
         image = "";
         break;
     }
 
     // Move pet
+    if (playerState == PlayerState.hurting || playerState == PlayerState.dead) {
+      pet!.petState = PetState.idle;
+    }
     pet!.movePet(timeElapsed, playerX, playerSpeedX, facingDirection);
   }
 }

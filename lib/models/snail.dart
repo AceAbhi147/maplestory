@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:maplestory/assets/assets.dart';
 import 'package:maplestory/models/enums/facing_direction.dart';
 
@@ -71,7 +73,7 @@ class Snail {
   double get maxX => _maxX;
 
   void moveSnail(int timeElapsed) {
-    num dt = (timeElapsed - _lastFrameTimestamp).clamp(0.0, 150.0);
+    num dt = (timeElapsed - _lastFrameTimestamp);
     switch (snailState) {
       case SnailState.moving:
         if (snailX <= minX) {
@@ -91,13 +93,13 @@ class Snail {
         break;
       case SnailState.hurting:
         snailSpeedX = 0.0;
-        if (dt >= 500) {
-          if (++_animationFrame >= AppAssets.snail_hurting.length) {
-            snailState = SnailState.dead;
-          }
+        animationFrame = min(AppAssets.snail_hurting.length - 1, dt ~/ 200);
+        image = "assets/images/snail/snailhurt_$_animationFrame.png";
+
+        if (dt >= 800) {
+          snailState = SnailState.dead;
           _lastFrameTimestamp = timeElapsed;
         }
-        image = "assets/images/snail/snailhurt_$_animationFrame.png";
         break;
       default:
         image = "";
