@@ -15,11 +15,9 @@ class Pet {
     double petX = -0.7,
     double petY = 0.97,
     FacingDirection facingDirection = FacingDirection.right,
-  })
-      : _petX = petX,
-        _petY = petY,
-        _facingDirection = facingDirection;
-
+  }) : _petX = petX,
+       _petY = petY,
+       _facingDirection = facingDirection;
 
   double get petX => _petX;
 
@@ -62,8 +60,12 @@ class Pet {
     _animationFrame = value;
   }
 
-  void movePet(int timeElapsed, double playerX, double playerSpeedX,
-      FacingDirection playerDirection) {
+  void movePet(
+    int timeElapsed,
+    double playerX,
+    double playerSpeedX,
+    FacingDirection playerDirection,
+  ) {
     num dt = (timeElapsed - lastFrameTimestamp).clamp(0.0, 150);
     if (playerSpeedX == 0.0) {
       petState = PetState.idle;
@@ -86,13 +88,26 @@ class Pet {
         image = "assets/images/cat/cat_$animationFrame.png";
         break;
       case PetState.moving:
-        if ((playerX - petX).abs() >= 0.25) {
-          petX += playerSpeedX * dt;
+        double followDistance = 0.25;
+        double followSpeedMultiplier = 0.8;
+
+        double distance = (playerX - petX).abs();
+
+        if (distance > followDistance) {
+          double petSpeed =
+              playerSpeedX.abs() * followSpeedMultiplier *
+                  (playerX > petX ? 1 : -1);
+
+          petX += petSpeed * dt;
         }
+
         if (dt >= 100) {
-          animationFrame = (animationFrame + 1) % AppAssets.cat_running.length;
+          animationFrame =
+              (animationFrame + 1) % AppAssets.cat_running.length;
+
           lastFrameTimestamp = timeElapsed;
         }
+
         image = "assets/images/cat/catrunning_$animationFrame.png";
         break;
     }

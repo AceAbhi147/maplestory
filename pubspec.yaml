@@ -82,6 +82,9 @@ flutter:
     - family: Regular
       fonts:
         - asset: assets/fonts/regular.ttf
+    - family: Game
+      fonts:
+        - asset: assets/fonts/game.ttf
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

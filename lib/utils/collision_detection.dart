@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:math';
 
 import 'package:maplestory/models/enums/ninja_star_state.dart';
 import 'package:maplestory/models/enums/player_state.dart';
@@ -16,6 +17,7 @@ class CollisionDetection {
     List<Snail> snails,
     Queue<NinjaStar> ninjaStars,
     List<PointsPopupData> popups,
+    Player player,
   ) {
     for (final snail in snails) {
       for (final ninjaStar in ninjaStars) {
@@ -27,6 +29,8 @@ class CollisionDetection {
             ninjaStar.ninjaStarState != NinjaStarState.dead) {
           snail.snailState = SnailState.hurting;
           ninjaStar.ninjaStarState = NinjaStarState.dead;
+          player.xp = min(1.0, player.xp + 0.1);
+          player.score += snail.points;
           popups.add(
             PointsPopupData(points: snail.points, x: snail.snailX, y: 0.0),
           );
@@ -49,9 +53,8 @@ class CollisionDetection {
           player.playerState != PlayerState.dead) {
         player.jump(isHurt: true);
         player.playerState = PlayerState.hurting;
-        popups.add(
-          PointsPopupData(points: -10, x: player.playerX, y: 0.0),
-        );
+        player.hp = max(0.0, player.hp - 0.1);
+        popups.add(PointsPopupData(points: -10, x: player.playerX, y: 0.0));
       }
     }
   }

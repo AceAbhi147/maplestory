@@ -6,6 +6,7 @@ import 'package:maplestory/assets/assets.dart';
 import 'package:maplestory/models/enums/facing_direction.dart';
 import 'package:maplestory/models/enums/ninja_star_state.dart';
 import 'package:maplestory/models/enums/player_state.dart';
+import 'package:maplestory/models/enums/snail_state.dart';
 import 'package:maplestory/models/ninja_star.dart';
 import 'package:maplestory/models/pet.dart';
 import 'package:maplestory/models/player.dart';
@@ -42,19 +43,12 @@ class _GameScreenState extends State<GameScreen>
   late final Pet pet;
   late final Player player;
 
-  // Pet position
-  double petX = -0.7;
-  double petY = 0.97;
-  bool isPetFacingLeft = false;
-  bool isPetRunning = false;
-  int petImageCount = 0;
-
   @override
   void initState() {
-    startGame();
     initialiseSnails();
     pet = Pet.name();
     player = Player.name(pet: pet);
+    startGame();
     super.initState();
   }
 
@@ -83,7 +77,11 @@ class _GameScreenState extends State<GameScreen>
         snails,
         ninjaStars,
         popups,
+        player,
       );
+      if (snails.isEmpty || player.playerState == PlayerState.dead) {
+        endGame();
+      }
       setState(() => {});
     });
 
@@ -109,11 +107,21 @@ class _GameScreenState extends State<GameScreen>
 
   // End Game
   void endGame() {
+    if (gameEnded) return;
+
     gameEnded = true;
+    gameStarted = false;
+
+    _gameTicker?.stop();
+
+    setState(() {});
   }
 
   // Move snail
   void moveSnail(int timeElapsed) {
+    snails.removeWhere(
+          (snail) => snail.snailState == SnailState.dead,
+    );
     for (final snail in snails) {
       snail.moveSnail(timeElapsed);
     }
@@ -168,28 +176,53 @@ class _GameScreenState extends State<GameScreen>
               ),
               child: Stack(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  gameEnded
+                      ? Align(
+                          alignment: Alignment(0.0, 0.0),
+                          child: Text(
+                            "Game Over!!",
+                            style: TextStyle(
+                              fontSize: 40,
+                              fontFamily: "Game",
+                              color: Colors.white,
+                            ),
+                          ),
+                        )
+                      : SizedBox.shrink(),
+                  Column(
                     children: [
-                      HudBarWidget(
-                        x: -0.8,
-                        y: -0.9,
-                        width: 240,
-                        height: 50,
-                        backgroundColor: Colors.white,
-                        fillColor: Colors.red,
-                        progressValue: 1.0,
-                        title: "HP",
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          HudBarWidget(
+                            x: -0.8,
+                            y: -0.9,
+                            width: 200,
+                            height: 30,
+                            backgroundColor: Colors.white,
+                            fillColor: Colors.red,
+                            progressValue: player.hp,
+                            title: "HP",
+                          ),
+                          HudBarWidget(
+                            x: 0.8,
+                            y: -0.9,
+                            width: 200,
+                            height: 30,
+                            backgroundColor: Colors.white,
+                            fillColor: Colors.green,
+                            progressValue: player.xp,
+                            title: "XP",
+                          ),
+                        ],
                       ),
-                      HudBarWidget(
-                        x: 0.8,
-                        y: -0.9,
-                        width: 240,
-                        height: 50,
-                        backgroundColor: Colors.white,
-                        fillColor: Colors.green,
-                        progressValue: 1.0,
-                        title: "XP",
+                      Text(
+                        "Total Score: ${player.score}",
+                        style: TextStyle(
+                          fontSize: 30,
+                          fontFamily: "Game",
+                          color: Colors.white,
+                        ),
                       ),
                     ],
                   ),

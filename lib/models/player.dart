@@ -19,6 +19,9 @@ class Player {
   double jumpingUpVelocity = 1.5;
   double gravity = -4.2;
   bool _isGrounded = true;
+  double _score = 0.0;
+  double _hp = 1.0;
+  double _xp = 0.0;
 
   Player.name({
     double playerX = -0.5,
@@ -112,6 +115,25 @@ class Player {
 
   set isGrounded(bool value) {
     _isGrounded = value;
+  }
+
+
+  double get score => _score;
+
+  set score(double value) {
+    _score = value;
+  }
+
+  double get hp => _hp;
+
+  set hp(double value) {
+    _hp = value;
+  }
+
+  double get xp => _xp;
+
+  set xp(double value) {
+    _xp = value;
   }
 
   void continuouslyMovePlayer(FacingDirection direction) {
@@ -209,7 +231,11 @@ class Player {
         image = "assets/images/ninja/ninjahurt$animationFrame.png";
 
         if (dt >= 800) {
-          playerState = PlayerState.dead;
+          if (hp < 0.1) {
+            playerState = PlayerState.dead;
+          } else {
+            playerState = PlayerState.idle;
+          }
           _lastFrameTimestamp = timeElapsed;
         }
       default:
@@ -220,7 +246,7 @@ class Player {
     }
 
     // Move pet
-    if (playerState == PlayerState.hurting || playerState == PlayerState.dead) {
+    if (playerState != PlayerState.moving) {
       pet!.petState = PetState.idle;
     }
     pet!.movePet(timeElapsed, playerX, playerSpeedX, facingDirection);

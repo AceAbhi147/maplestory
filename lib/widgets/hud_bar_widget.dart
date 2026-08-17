@@ -44,7 +44,7 @@ class HudBarWidget extends StatelessWidget {
                 ),
                 SizedBox(width: 5,),
                 Text(
-                  "${progressValue * 100}",
+                  "${(progressValue * 100).toInt()}",
                   style: TextStyle(fontSize: 25, fontFamily: "Regular"),
                 ),
               ],
