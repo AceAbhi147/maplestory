@@ -7,6 +7,7 @@ import 'package:maplestory/models/ninja_star.dart';
 import 'package:maplestory/models/snail.dart';
 
 import '../models/player.dart';
+import '../models/points_popup_data.dart';
 
 class CollisionDetection {
   static final collisionEpsilon = 0.1;
@@ -14,6 +15,7 @@ class CollisionDetection {
   static void checkForCollisionBtwNinjaStarAndSnail(
     List<Snail> snails,
     Queue<NinjaStar> ninjaStars,
+    List<PointsPopupData> popups,
   ) {
     for (final snail in snails) {
       for (final ninjaStar in ninjaStars) {
@@ -25,6 +27,9 @@ class CollisionDetection {
             ninjaStar.ninjaStarState != NinjaStarState.dead) {
           snail.snailState = SnailState.hurting;
           ninjaStar.ninjaStarState = NinjaStarState.dead;
+          popups.add(
+            PointsPopupData(points: snail.points, x: snail.snailX, y: 0.0),
+          );
         }
       }
     }
@@ -33,6 +38,7 @@ class CollisionDetection {
   static void checkForCollisionBtwPlayerAndSnail(
     Player player,
     List<Snail> snails,
+    List<PointsPopupData> popups,
   ) {
     for (final snail in snails) {
       if (((player.playerX - snail.snailX).abs() <= collisionEpsilon) &&
@@ -41,7 +47,11 @@ class CollisionDetection {
           snail.snailState != SnailState.dead &&
           player.playerState != PlayerState.hurting &&
           player.playerState != PlayerState.dead) {
+        player.jump(isHurt: true);
         player.playerState = PlayerState.hurting;
+        popups.add(
+          PointsPopupData(points: -10, x: player.playerX, y: 0.0),
+        );
       }
     }
   }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:maplestory/assets/assets.dart';
 import 'package:maplestory/screens/game_screen.dart';
-import 'package:maplestory/widgets/loading_bar.dart';
+import 'package:maplestory/widgets/loading_bar_widget.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -115,7 +115,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
                 SizedBox(height: 30),
                 _loadingProgress < 1.0
-                    ? LoadingBar(loadingProgress: _loadingProgress)
+                    ? LoadingBarWidget(loadingProgress: _loadingProgress)
                     : ElevatedButton(
                         onPressed: () {
                           Navigator.pushReplacement(

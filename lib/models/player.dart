@@ -131,13 +131,13 @@ class Player {
     playerSpeedX = 0.0;
   }
 
-  void jump() {
+  void jump({bool isHurt = false}) {
     if (!isGrounded) return;
     isGrounded = false;
     if (facingDirection == FacingDirection.left) {
-      playerSpeedX = -0.0005;
+      playerSpeedX = !isHurt ? -0.0005 : 0.003;
     } else {
-      playerSpeedX = 0.0005;
+      playerSpeedX = !isHurt ? 0.0005 : -0.003;
     }
     playerState = PlayerState.jumping;
     jumpingUpVelocity = 1.5;
@@ -160,7 +160,9 @@ class Player {
         jumpingUpVelocity = 1.5;
         isGrounded = true;
 
-        playerState = PlayerState.idle;
+        if (playerState == PlayerState.jumping) {
+          playerState = PlayerState.idle;
+        }
       }
     }
 
@@ -198,18 +200,15 @@ class Player {
         image = "assets/images/ninja/ninjathrow1.png";
         break;
       case PlayerState.hurting:
-        if (facingDirection == FacingDirection.left) {
-          playerSpeedX = 0.005;
-        } else {
-          playerSpeedX = -0.005;
+        if (isGrounded) {
+          playerSpeedX = 0.0;
         }
-
         playerX += playerSpeedX;
 
         animationFrame = (dt ~/ 100) % AppAssets.ninja_hurting.length;
         image = "assets/images/ninja/ninjahurt$animationFrame.png";
 
-        if (dt >= 500) {
+        if (dt >= 800) {
           playerState = PlayerState.dead;
           _lastFrameTimestamp = timeElapsed;
         }

@@ -16,6 +16,7 @@ class Snail {
   String image = "";
   final double _minX;
   final double _maxX;
+  final int points = 100;
 
   Snail.name({
     required double snailX,

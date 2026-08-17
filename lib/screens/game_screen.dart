@@ -9,10 +9,13 @@ import 'package:maplestory/models/enums/player_state.dart';
 import 'package:maplestory/models/ninja_star.dart';
 import 'package:maplestory/models/pet.dart';
 import 'package:maplestory/models/player.dart';
+import 'package:maplestory/models/points_popup_data.dart';
 import 'package:maplestory/utils/collision_detection.dart';
+import 'package:maplestory/widgets/hud_bar_widget.dart';
 import 'package:maplestory/widgets/ninja_star_widget.dart';
 import 'package:maplestory/widgets/pet_widget.dart';
 import 'package:maplestory/widgets/player_widget.dart';
+import 'package:maplestory/widgets/points_popup.dart';
 import 'package:maplestory/widgets/snail_widget.dart';
 
 import '../models/snail.dart';
@@ -34,6 +37,8 @@ class _GameScreenState extends State<GameScreen>
 
   List<Snail> snails = [];
   Queue<NinjaStar> ninjaStars = Queue();
+  List<PointsPopupData> popups = [];
+
   late final Pet pet;
   late final Player player;
 
@@ -69,10 +74,15 @@ class _GameScreenState extends State<GameScreen>
       movePlayer(_elapsedTime);
       moveSnail(_elapsedTime);
       moveNinjaStar(_elapsedTime);
-      CollisionDetection.checkForCollisionBtwPlayerAndSnail(player, snails);
+      CollisionDetection.checkForCollisionBtwPlayerAndSnail(
+        player,
+        snails,
+        popups,
+      );
       CollisionDetection.checkForCollisionBtwNinjaStarAndSnail(
         snails,
         ninjaStars,
+        popups,
       );
       setState(() => {});
     });
@@ -158,6 +168,45 @@ class _GameScreenState extends State<GameScreen>
               ),
               child: Stack(
                 children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      HudBarWidget(
+                        x: -0.8,
+                        y: -0.9,
+                        width: 240,
+                        height: 50,
+                        backgroundColor: Colors.white,
+                        fillColor: Colors.red,
+                        progressValue: 1.0,
+                        title: "HP",
+                      ),
+                      HudBarWidget(
+                        x: 0.8,
+                        y: -0.9,
+                        width: 240,
+                        height: 50,
+                        backgroundColor: Colors.white,
+                        fillColor: Colors.green,
+                        progressValue: 1.0,
+                        title: "XP",
+                      ),
+                    ],
+                  ),
+                  ...popups.map(
+                    (popup) => Align(
+                      alignment: Alignment(popup.x, popup.y),
+                      child: PointsPopup(
+                        points: popup.points,
+                        key: ValueKey(popup.id),
+                        onFinished: () {
+                          setState(() {
+                            popups.remove(popup);
+                          });
+                        },
+                      ),
+                    ),
+                  ),
                   Align(
                     alignment: Alignment(-1.0, 1.0),
                     child: GestureDetector(
@@ -165,14 +214,22 @@ class _GameScreenState extends State<GameScreen>
                           player.continuouslyMovePlayer(FacingDirection.left),
                       onTapUp: (_) => player.stopPlayerMovement(),
                       onTapCancel: () => player.stopPlayerMovement(),
-                      child: Container(height: 300, width: 100, color: Colors.transparent),
+                      child: Container(
+                        height: 300,
+                        width: 100,
+                        color: Colors.transparent,
+                      ),
                     ),
                   ),
                   Align(
                     alignment: Alignment(0.0, 0.5),
                     child: GestureDetector(
                       onTap: () => player.jump(),
-                      child: Container(height: 300, width: 500, color: Colors.transparent),
+                      child: Container(
+                        height: 300,
+                        width: 500,
+                        color: Colors.transparent,
+                      ),
                     ),
                   ),
                   Align(
@@ -182,7 +239,11 @@ class _GameScreenState extends State<GameScreen>
                           player.continuouslyMovePlayer(FacingDirection.right),
                       onTapUp: (_) => player.stopPlayerMovement(),
                       onTapCancel: () => player.stopPlayerMovement(),
-                      child: Container(height: 300, width: 100, color: Colors.transparent),
+                      child: Container(
+                        height: 300,
+                        width: 100,
+                        color: Colors.transparent,
+                      ),
                     ),
                   ),
                   Align(
