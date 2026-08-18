@@ -1,9 +1,9 @@
 # Game 3: Maplestory
 
 ## Gameplay
-| Gameplay 1                                   | Gameplay 2                                    |
- |----------------------------------------------|-----------------------------------------------|
-| ![▶️ Gameplay](assets/gameplay/gameplay.gif) | ![▶️ Gameplay](assets/gameplay/gameplay2.gif) |
+| Gameplay 1                                    | Gameplay 2                                   |
+ |-----------------------------------------------|----------------------------------------------|
+| ![▶️ Gameplay](assets/gameplay/gameplay.gif)  | ![▶️ Gameplay](assets/gameplay/gameplay2.gif) |
 
 ## Learnings
 - Ticker for controling animation frames and game physics simulation
